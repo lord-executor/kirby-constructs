@@ -1,0 +1,19 @@
+{
+	"name": "constructs",
+	"version": "1.0.0",
+	"type": "kirby-plugin",
+	"description": "Kirby CMS plugin with support for modular page component bundles with blueprints, controllers, templates and supporting files",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/lord-executor/kirby-constructs.git"
+	},
+	"keywords": [
+		"kirby"
+	],
+	"author": "Lukas Angerer",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/lord-executor/kirby-constructs/issues"
+	},
+	"homepage": "https://github.com/lord-executor/kirby-constructs#readme"
+}
