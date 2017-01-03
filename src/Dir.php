@@ -15,39 +15,86 @@ class Dir
 	{
 		$this->path = $path;
 
-		$items = array_filter(scandir($this->path), function ($entry) {
-			return $entry !== '.' && $entry !== '..';
-		});
-
-		$this->entries = array_map(function ($entry) use ($path) {
-			return new Obj(['name' => $entry, 'path' => $path . DS . $entry]);
-		}, $items);
+		$this->entries = Enumerable::fromArray(scandir($this->path))
+			->filter([static::class, 'filterExcludeDots'])
+			->map(static::expandObj($path));
 	}
 
 	public function files()
 	{
-		return array_filter($this->entries, function ($entry) {
-			return is_file($entry->path());
-		});
+		return $this->entries->filter([static::class, 'filterFiles']);
 	}
 
 	public function dirs()
 	{
-		$dirs = array_filter($this->entries, function ($entry) {
-			return is_dir($entry->path());
-		});
-
-		return array_map(function ($dir) {
-			if (!isset($dir->dir)) {
-				$dir->set('dir', new Dir($dir->path));
-			}
-
-			return $dir;
-		}, $dirs);
+		return $this->entries
+			->filter([static::class, 'filterDirectories'])
+			->map([static::class, 'extendDir']);
 	}
 
 	public function all()
 	{
 		return $this->entries;
+	}
+
+	public function find($predicate)
+	{
+		return Enumerable::fromArray($this->findInternal($predicate, $this->path));
+	}
+
+	private function findInternal($predicate, $base)
+	{
+		$result = [];
+
+		foreach ($this->entries as $entry) {
+			if (call_user_func($predicate, $entry)) {
+				$clone = clone($entry);
+				$clone->set('relative', substr($clone->path(), strlen($base) + 1));
+				$result[] = $clone;
+			} else if ($entry->isDir()) {
+				$child = new Dir($entry->path());
+				$result = array_merge($result, $child->findInternal($predicate, $base));
+			}
+		}
+
+		return $result;
+	}
+
+	public static function filterExcludeDots($name)
+	{
+		return $name !== '.' && $name !== '..';
+	}
+
+	public static function filterFiles($entry)
+	{
+		return $entry->isFile();
+	}
+
+	public static function filterDirectories($entry)
+	{
+		return $entry->isDir();
+	}
+
+	public static function expandObj($path)
+	{
+		return function ($name) use ($path) {
+			$filePath = $path . DS . $name;
+			return new Obj([
+				'name' => $name,
+				'path' => $filePath,
+				'isDir' => is_dir($filePath),
+				'isFile' => is_file($filePath),
+			]);
+		};
+	}
+
+	public static function extendDir($entry)
+	{
+		if (!isset($entry->dir)) {
+			$clone = clone($entry);
+			$clone->set('dir', new Dir($clone->path));
+		}
+
+		return $entry;
 	}
 }

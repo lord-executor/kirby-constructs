@@ -18,6 +18,7 @@ class ConstructManager
 
 	public function register($path)
 	{
+		$name = basename($path);
 		$dir = new Dir(self::componentsPath($path));
 
 		foreach ($dir->dirs() as $component) {
@@ -35,10 +36,25 @@ class ConstructManager
 			}
 
 		}
+
+		$dir = new Dir(self::snippetsPath($path));
+		$snippets = $dir->find(function ($entry) {
+			return pathinfo($entry->name(), PATHINFO_EXTENSION) === 'php';
+		});
+
+		foreach ($snippets as $snippet) {
+			// constructs/myconstruct/snippets/test.php => snippet "name" constructs/myconstruct/test
+			$this->kirby->set('snippet', 'constructs' . DS . $name . DS . substr($snippet->relative(), 0, -4), $snippet->path());
+		}
 	}
 
 	public static function componentsPath($path)
 	{
 		return $path . DS . 'components';
+	}
+
+	public static function snippetsPath($path)
+	{
+		return $path . DS . 'snippets';
 	}
 }
