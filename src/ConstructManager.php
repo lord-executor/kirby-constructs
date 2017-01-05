@@ -2,26 +2,36 @@
 
 namespace Constructs;
 
+use Composer\Autoload\ClassLoader;
+use Data;
 use Kirby;
 
 
 class ConstructManager
 {
 	private $kirby;
+	private $loader;
 
-	public function __construct(Kirby $kirby)
+	public function __construct(Kirby $kirby, ClassLoader $loader)
 	{
 		$this->kirby = $kirby;
+		$this->loader = $loader;
 	}
 
 	public function register($path)
 	{
-		$this->registerComponents($path);
-		$this->registerSnippets($path);
-		$this->registerGlobalFields($path);
+		$settings = Data::read($path . DS . 'settings.yml', 'yaml');
+
+		if (is_dir($path . DS . 'src')) {
+			$this->loader->addPsr4($settings['rootNamespace'] . '\\', $path . DS . 'src');
+		}
+
+		$this->registerComponents($path, $settings);
+		$this->registerSnippets($path, $settings);
+		$this->registerGlobalFields($path, $settings);
 	}
 
-	protected function registerComponents($path)
+	protected function registerComponents($path, $settings)
 	{
 		$dir = new Dir(self::componentsPath($path));
 
@@ -42,17 +52,15 @@ class ConstructManager
 		}
 	}
 
-	protected function registerSnippets($path)
+	protected function registerSnippets($path, $settings)
 	{
-		$name = basename($path);
-
 		foreach ((new Dir(self::snippetsPath($path)))->find(Dir::filterByExtension('php')) as $snippet) {
 			// constructs/myconstruct/snippets/test.php => snippet "name" constructs/myconstruct/test
-			$this->kirby->set('snippet', 'constructs' . DS . $name . DS . substr($snippet->relative(), 0, -4), $snippet->path());
+			$this->kirby->set('snippet', 'constructs' . DS . $settings['name'] . DS . substr($snippet->relative(), 0, -4), $snippet->path());
 		}
 	}
 
-	protected function registerGlobalFields($path)
+	protected function registerGlobalFields($path, $settings)
 	{
 		foreach ((new Dir(self::fieldsPath($path)))->find(Dir::filterByExtension('yml')) as $field) {
 			$this->kirby->set('blueprint', 'fields/' . basename($field->name(), '.yml'), $field->path());

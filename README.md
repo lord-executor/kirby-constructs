@@ -9,4 +9,5 @@ TODO
 ## Features
 
 ## ToDo
-* construct config for common component prefix
+* assets and asset routing
+* sample construct repository

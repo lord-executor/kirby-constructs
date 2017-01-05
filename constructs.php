@@ -2,17 +2,13 @@
 
 $loader = new \Composer\Autoload\ClassLoader();
 $loader->addPsr4('Constructs\\', __DIR__ . DS . 'src');
+$loader->register();
 
-foreach (c::get('constructs.dirs', ['Constructs' => 'site/constructs']) as $name => $constructDir) {
-	$dir = $kirby->roots()->index . DS . $constructDir;
-	if (is_dir($dir . DS . 'src')) {
-		$loader->addPsr4($name . '\\', $dir . DS . 'src');
-	}
+$loader = new \Composer\Autoload\ClassLoader();
+$mgr = new \Constructs\ConstructManager($kirby, $loader);
+
+foreach (c::get('constructs.dirs', ['site/constructs']) as $constructDir) {
+	$mgr->register($kirby->roots()->index . DS . $constructDir);
 }
 
 $loader->register();
-
-$mgr = new \Constructs\ConstructManager($kirby);
-foreach (c::get('constructs.dirs', ['Constructs' => 'site/constructs']) as $name => $constructDir) {
-	$mgr->register($kirby->roots()->index . DS . $constructDir);
-}
