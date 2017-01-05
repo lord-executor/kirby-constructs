@@ -1,17 +1,19 @@
 <?php
 
+load([
+	'kirby\\registry\\construct'    => __DIR__ . DS . 'kirby' . DS . 'registry' . DS . 'Construct.php',
+]);
+
 $loader = new \Composer\Autoload\ClassLoader();
 $loader->addPsr4('Constructs\\', __DIR__ . DS . 'src');
 $loader->register();
 
-$loader = new \Composer\Autoload\ClassLoader();
-$mgr = new \Constructs\ConstructManager($kirby, $loader);
+
+$mgr = \Constructs\ConstructManager::instance();
 
 foreach (c::get('constructs.dirs', ['site/constructs']) as $constructDir) {
 	$mgr->register($kirby->roots()->index . DS . $constructDir);
 }
-
-$loader->register();
 
 $kirby->routes([
 	'constructAssets' => [
