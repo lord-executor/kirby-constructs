@@ -22,3 +22,11 @@ $kirby->routes([
 		'action' => [$mgr, 'assetsAction'],
 	],
 ]);
+
+Page::$methods['components'] = function (Page $page, $container = NULL) {
+	if ($container === NULL) {
+		return $page->children();
+	} else {
+		return $page->find($container)->children();
+	}
+};

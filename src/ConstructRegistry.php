@@ -18,7 +18,7 @@ class ConstructRegistry extends Entry
 		if(is_null($name)) {
 			return static::$components;
 		} else if (isset(static::$components[$name])) {
-			static::$components[$name];
+			return static::$components[$name];
 		}
 
 		return false;

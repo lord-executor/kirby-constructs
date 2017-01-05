@@ -37,6 +37,11 @@ class Construct
 		return A::get($this->settings, 'pageModel');
 	}
 
+	public function nesting()
+	{
+		return A::get($this->settings, 'nesting', 'children');
+	}
+
 	public function componentsPath()
 	{
 		return $this->path() . DS . 'components';

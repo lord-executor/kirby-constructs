@@ -9,10 +9,22 @@ class ComponentPage extends Page
 {
 	public function host()
 	{
-//		if ($this->parent()->uid() === Settings::parentUid()) {
-//			return $this->parent()->parent();
-//		} else {
-//			return $this->parent();
-//		}
+		/** @var Construct $construct */
+		$construct = $this->kirby->get('construct', $this->intendedTemplate());
+
+		if ($construct) {
+			if ($construct->nesting() === 'children') {
+				return $this->parent();
+			} else {
+				return $this->parent()->parent();
+			}
+		}
+
+		return NULL;
+	}
+
+	public function render()
+	{
+		return $this->kirby->render($this);
 	}
 }
