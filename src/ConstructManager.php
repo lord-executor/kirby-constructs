@@ -2,6 +2,7 @@
 
 namespace Constructs;
 
+use A;
 use Composer\Autoload\ClassLoader;
 use Data;
 use F;
@@ -73,6 +74,9 @@ class ConstructManager
 
 			if (file_exists($component->path() . DS . $component->name() . '.yml')) {
 				$this->kirby->set('blueprint', $component->name(), $component->path() . DS . $component->name() . '.yml');
+				if (A::get($settings, 'pageModel')) {
+					$this->kirby->set('page::model', $component->name(), A::get($settings, 'pageModel'));
+				}
 			}
 
 			if (file_exists($component->path() . DS . $component->name() . '.php')) {
