@@ -15,9 +15,13 @@ class Dir
 	{
 		$this->path = $path;
 
-		$this->entries = Enumerable::fromArray(scandir($this->path))
-			->filter([static::class, 'filterExcludeDots'])
-			->map(static::expandObj($path));
+		if (is_dir($path)) {
+			$this->entries = Enumerable::fromArray(scandir($this->path))
+				->filter([static::class, 'filterExcludeDots'])
+				->map(static::expandObj($path));
+		} else {
+			$this->entries = Enumerable::fromArray([]);
+		}
 	}
 
 	public function files()
@@ -73,6 +77,13 @@ class Dir
 	public static function filterDirectories($entry)
 	{
 		return $entry->isDir();
+	}
+
+	public static function filterByExtension($extension)
+	{
+		return function ($entry) use ($extension) {
+			return pathinfo($entry->name(), PATHINFO_EXTENSION) === $extension;
+		};
 	}
 
 	public static function expandObj($path)
