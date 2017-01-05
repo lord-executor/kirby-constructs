@@ -12,3 +12,11 @@ foreach (c::get('constructs.dirs', ['site/constructs']) as $constructDir) {
 }
 
 $loader->register();
+
+$kirby->routes([
+	'constructAssets' => [
+		'pattern' => 'assets/constructs/(:any)/(:all)',
+		'method' => 'GET',
+		'action' => [$mgr, 'assetsAction'],
+	],
+]);

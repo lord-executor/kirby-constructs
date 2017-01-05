@@ -4,23 +4,31 @@ namespace Constructs;
 
 use Composer\Autoload\ClassLoader;
 use Data;
+use F;
 use Kirby;
+use Media;
+use Response;
 
 
 class ConstructManager
 {
 	private $kirby;
 	private $loader;
+	private $constructs;
 
 	public function __construct(Kirby $kirby, ClassLoader $loader)
 	{
 		$this->kirby = $kirby;
 		$this->loader = $loader;
+		$this->constructs = [];
 	}
 
 	public function register($path)
 	{
 		$settings = Data::read($path . DS . 'settings.yml', 'yaml');
+		$settings['path'] = $path;
+
+		$this->constructs[$settings['name']] = $settings;
 
 		if (is_dir($path . DS . 'src')) {
 			$this->loader->addPsr4($settings['rootNamespace'] . '\\', $path . DS . 'src');
@@ -29,6 +37,32 @@ class ConstructManager
 		$this->registerComponents($path, $settings);
 		$this->registerSnippets($path, $settings);
 		$this->registerGlobalFields($path, $settings);
+	}
+
+	/**
+	 * Code mostly borrowed from Kirby's 'pluginAssets' route (kirby.php)
+	 *
+	 * @param string $construct
+	 *   The name of the construct from which the asset should be retrieved.
+	 * @param string $path
+	 *   The relative path to the asset within the construct's 'assets' directory.
+	 *
+	 * @return Response
+	 */
+	public function assetsAction($construct, $path)
+	{
+		$settings = $this->constructs[$construct];
+
+		if ($settings) {
+			$assetPath = $settings['path'] . DS . 'assets' . DS . $path;
+			$file = new Media($assetPath);
+
+			if ($file->exists()) {
+				return new Response(F::read($assetPath), F::extension($assetPath));
+			}
+		}
+
+		return new Response('The file could not be found', F::extension($path), 404);
 	}
 
 	protected function registerComponents($path, $settings)
