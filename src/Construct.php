@@ -67,4 +67,9 @@ class Construct
 	{
 		return $this->path() . DS . 'fields';
 	}
+
+	public function initFilePath()
+	{
+		return $this->path() . DS . A::get($this->settings, 'initFile', 'init.php');
+	}
 }

@@ -49,6 +49,11 @@ class ConstructManager
 		$this->registerComponents($construct);
 		$this->registerSnippets($construct);
 		$this->registerGlobalFields($construct);
+
+		$initFile = $construct->initFilePath();
+		if (file_exists($initFile)) {
+			require($initFile);
+		}
 	}
 
 	/**
