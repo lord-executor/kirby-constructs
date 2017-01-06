@@ -12,7 +12,7 @@ $loader->register();
 $mgr = \Constructs\ConstructManager::instance();
 
 foreach (c::get('constructs.dirs', ['site/constructs']) as $constructDir) {
-	$mgr->register($kirby->roots()->index . DS . $constructDir);
+	$mgr->find($kirby->roots()->index . DS . $constructDir);
 }
 
 $kirby->routes([

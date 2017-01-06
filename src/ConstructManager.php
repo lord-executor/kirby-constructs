@@ -36,6 +36,17 @@ class ConstructManager
 		$this->constructs = [];
 	}
 
+	public function find($path)
+	{
+		$dir = new Dir($path);
+
+		foreach ($dir->dirs() as $construct) {
+			if (file_exists($construct->path() . DS . 'settings.yml')) {
+				$this->register($construct->path());
+			}
+		}
+	}
+
 	public function register($path)
 	{
 		$construct = new Construct($path);
