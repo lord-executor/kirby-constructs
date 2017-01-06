@@ -1,7 +1,7 @@
 <?php
 
 load([
-	'kirby\\registry\\construct'    => __DIR__ . DS . 'kirby' . DS . 'registry' . DS . 'Construct.php',
+	'kirby\\registry\\construct' => __DIR__ . DS . 'kirby' . DS . 'registry' . DS . 'Construct.php',
 ]);
 
 $loader = new \Composer\Autoload\ClassLoader();

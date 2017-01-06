@@ -16,7 +16,9 @@ class ConstructManager
 
 	public static function instance()
 	{
-		if(!is_null(static::$instance)) return static::$instance;
+		if (!is_null(static::$instance)) {
+			return static::$instance;
+		}
 		return static::$instance = new static(kirby());
 	}
 
