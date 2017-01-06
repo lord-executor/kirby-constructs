@@ -73,7 +73,7 @@ class Construct
 	 */
 	public function pageModel()
 	{
-		return A::get($this->settings, 'pageModel');
+		return A::get($this->settings, 'pageModel', 'Constructs\ComponentPage');
 	}
 
 	/**
@@ -123,6 +123,11 @@ class Construct
 	 */
 	public function initFilePath()
 	{
-		return $this->path() . DS . A::get($this->settings, 'initFile', 'init.php');
+		$initFile = A::get($this->settings, 'initFile', 'init.php');
+		if (realpath($initFile) === $initFile) {
+			return $initFile;
+		} else {
+			return $this->path() . DS . $initFile;
+		}
 	}
 }
