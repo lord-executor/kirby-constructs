@@ -21,6 +21,9 @@ to. The point of this plugin is to provide a common basis and layer of abstracti
 in every plugin. With Constructs, you can get straight to the point of your application, building blueprints and
 templates and do it in a way that is reusable.
 
+To get an idea of what could be done with Constructs, checkout the [Kirby Constructs Sample](https://github.com/lord-executor/kirby-constructs-sample)
+on Github.
+
 ## Features
 
 What you can do with Constructs:
@@ -109,8 +112,10 @@ initFile: init.php
   practice is to make the name match the directory and use all lowercase and dashes.
 * **rootNamespace** (required if you have a `src` directory) \
   The root namespace for the Construct's `src` directory.
-* **pageModel** (defaults to the Kirby `Page` class)
-  If set, all components in this construct will use the model class (fully qualified class name) specified here.
+* **pageModel** (defaults to the Kirby `Constructs\ComponentPage` class)
+  All components in this construct will use the model class (fully qualified class name) specified here. `ComponentPage`
+  derives directly from Kirby's `Page` class, but it adds some additional features. By setting this to `Page` you can
+  create components that are backed by the regular Kirby page model.
 * **nesting** (defaults to `children`)
   Controls the nesting structure of components within a page. See [Components as Building Blocks] for more details.
 * **initFile** (defaults to `init.php`)
@@ -136,16 +141,61 @@ my-component.html.php (template)
 ```
 
 ### Global Fields
-TODO
+Global field definitions work just like they do in [vanilla Kirby](https://getkirby.com/docs/panel/blueprints/global-field-definitions),
+except that you can place them in the `fields` directory of your Construct instead.
+
+### Snippets
+Adding snippets to your Construct is again fairly trivial. Just add the snippet file to the `snippets` directory of
+your Construct, but note that to avoid conflicts with snippets defined elsewhere, to include the snippet you will have
+to use the _virtual_ path which is determined like this: 
+```
+constructs/{constructName}/{pathToSnippet}/{snippetName}
+```
+
+So, if your snippet lies in `site/constructs/my-construct/snippets/special/snip.php`, then you can use the snippet like
+this
+```php
+<?php snippet('constructs/my-construct/special/snip') ?>
+```
 
 ### Classes
-TODO
+If your construct needs some logic or services or whatever kids nowadays call that kind of thing, then you'll probably
+want to put that stuff in some PHP classes that you can then use from your Component controllers and blueprints or
+in field / page methods or models. With Constructs you can just put those classes into your Construct's `src`
+directory and as long as you follow [PSR-4](http://www.php-fig.org/psr/psr-4/) conventions in combination with the
+`rootNamespace` defined in the `settings.yml` all of your classes will be autoloaded for you.
 
 ### Assets
-TODO
+Very much in line with the route that Kirby provides for [plugin assets](https://getkirby.com/docs/developer-guide/plugins/assets),
+Construct assets can be accessed through the following route.
+```
+http://{domain}/assets/constructs/{constructName}/{optionalSubfolder}/{filename}
+```
+
+This of course assumes that you have placed all your assets in the Construct's `assets` directory.
+
+For example, if your Construct has an asset in the path `site/constructs/my-construct/assets/js/main.js`, then you can
+attach this script to your template with
+```php
+<?php echo js('assets/constructs/my-construct/js/main.js'); ?>
+```
 
 ## Components as Building Blocks
-TODO
+You _can_ create Components that act like any other Kirby page if you so desire, but the design goal of Components was
+to also allow components to be _parts_ of a page very similar to what the [Kirby Modules Plugin](https://github.com/getkirby-plugins/modules-plugin)
+tries to do.
+
+You can make pages extremely flexible if you _outsource_ some of the building blocks of your pages into smaller
+elements - you could call them Components - and then compose the page by adding different Components to different pages.
+Of course you can already do some of that with structured fields and other patterns, but the Component style of
+implementation makes reuse a lot easier - particularly for more complex sites.
+
+The Constructs plugin tries to not make too many (most likely invalid) assumptions about the way you want to structure
+your pages or how you want to use Components, but it provides some (hopefully) helpful functions that can be used to
+accomplish a wide variety of things.
+
+To get an idea of _how_ Constructs can be used to build pages, check out the [Kirby Constructs Sample](https://github.com/lord-executor/kirby-constructs-sample)
+on Github.
 
 ## Overriding Constructs
 While Constructs are meant to be reusable, there are always going to be situations where the default is just not up to
@@ -154,13 +204,34 @@ _some_ of the things you might want to customize can be accomplished with overri
 Construct code at all.
 
 ### Blueprints, Controllers, Templates and Global Fields
-TODO
+Just create a file with the same name as the Component in your site's blueprints, controllers and / or templates
+directory, but **watch the file ending change** for templates from `*.html.php` in the Component directory to
+`*.php` in the site's template directory.
+
+Once the file is in place, it should automatically take precedence over the one provided by the Construct.
 
 ### Snippets
-TODO
+Again, this is just a matter of placing the modified file in the site's snippets directory making sure the _path_ in
+the snippets directory matches the _virtual path_ of the snippet in the Construct.
+```
+constructs/{constructName}/{pathToSnippet}/{snippetName}
+```
 
 ### Construct Configuration
-TODO
+You can also override the Construct configuration in the `settings.yml` file using Kirby's configuration. To do this,
+you can set each settings key individually according to the following Kirby config key naming convention.
+```
+constructs.{constructName}.{settingsKey}
+```
+
+So, to override the init file of `my-construct`, you could do something like this:
+```php
+c::set('constructs.my-construct.initFile', '/path/to/custom/initFile.php');
+```
+
+**Note** that most changes you can make here will inevitably **break** the construct. There are however _some_ cases where
+this could be useful, for example if you are trying to override the Construct initialization with your own code.
 
 # ToDo
 * Integration with Kirby JSON API plugin
+* Simple form of dependency injection (?)
