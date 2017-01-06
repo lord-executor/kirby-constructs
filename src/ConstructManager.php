@@ -3,6 +3,7 @@
 namespace Constructs;
 
 use Composer\Autoload\ClassLoader;
+use Constructs\Util\Dir;
 use F;
 use Kirby;
 use Media;

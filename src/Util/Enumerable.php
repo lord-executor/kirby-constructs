@@ -1,6 +1,6 @@
 <?php
 
-namespace Constructs;
+namespace Constructs\Util;
 
 
 use ArrayObject;
