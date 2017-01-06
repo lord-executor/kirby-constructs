@@ -10,10 +10,18 @@ use Media;
 use Response;
 
 
+/**
+ * Manages construct registration.
+ */
 class ConstructManager
 {
 	public static $instance;
 
+	/**
+	 * Singleton implementation.
+	 *
+	 * @return ConstructManager
+	 */
 	public static function instance()
 	{
 		if (!is_null(static::$instance)) {
@@ -28,8 +36,10 @@ class ConstructManager
 	private $constructs;
 
 	/**
-	 * ConstructManager constructor.
+	 * Creates a new construct manager.
+	 *
 	 * @param Kirby $kirby
+	 *   The Kirby instance.
 	 */
 	public function __construct(Kirby $kirby)
 	{
@@ -39,6 +49,13 @@ class ConstructManager
 		$this->constructs = [];
 	}
 
+	/**
+	 * Locates all constructs in the given path - that is: all subirectories with a settings.yml file - and registers
+	 * them with the manager.
+	 *
+	 * @param string $path
+	 *   Path to search for constructs.
+	 */
 	public function find($path)
 	{
 		$dir = new Dir($path);
@@ -50,6 +67,12 @@ class ConstructManager
 		}
 	}
 
+	/**
+	 * Registers a construct at the given location.
+	 *
+	 * @param string $path
+	 *   The path to a construct's main directory.
+	 */
 	public function register($path)
 	{
 		$construct = new Construct($path);
