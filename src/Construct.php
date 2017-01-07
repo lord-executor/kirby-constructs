@@ -123,11 +123,36 @@ class Construct
 	 */
 	public function initFilePath()
 	{
-		$initFile = A::get($this->settings, 'initFile', 'init.php');
-		if (realpath($initFile) === $initFile) {
-			return $initFile;
+		return $this->processRelativePath(A::get($this->settings, 'initFile', 'init.php'));
+	}
+
+	/**
+	 * Gets the default template to be used when a component does not define it's own template
+	 */
+	public function defaultTemplate()
+	{
+		return $this->processRelativePath(A::get($this->settings, 'defaultTemplate'));
+	}
+
+	/**
+	 * Makes relative paths relative to the construct's root directory. If the given path is already absolute or NULL,
+	 * it will return it as is.
+	 *
+	 * @param string $path
+	 *   The path to process.
+	 *
+	 * @return null|string
+	 */
+	protected function processRelativePath($path)
+	{
+		if ($path === NULL) {
+			return NULL;
+		}
+
+		if (realpath($path) === $path) {
+			return $path;
 		} else {
-			return $this->path() . DS . $initFile;
+			return $this->path() . DS . $path;
 		}
 	}
 }

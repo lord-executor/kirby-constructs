@@ -139,6 +139,8 @@ class ConstructManager
 
 				if (file_exists($component->path() . DS . $component->name() . '.html.php')) {
 					$this->kirby->set('template', $component->name(), $component->path() . DS . $component->name() . '.html.php');
+				} else if ($construct->defaultTemplate()) {
+					$this->kirby->set('template', $component->name(), $construct->defaultTemplate());
 				}
 			}
 
