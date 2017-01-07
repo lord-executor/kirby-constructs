@@ -1,6 +1,6 @@
 {
 	"name": "constructs",
-	"version": "1.0.0",
+	"version": "1.0.0-rc1",
 	"type": "kirby-plugin",
 	"description": "Kirby CMS plugin with support for modular page component bundles with blueprints, controllers, templates and supporting files",
 	"repository": {
