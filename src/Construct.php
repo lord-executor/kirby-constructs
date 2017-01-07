@@ -122,6 +122,16 @@ class Construct
 	}
 
 	/**
+	 * Gets the path to the language files of the construct.
+	 *
+	 * @return string
+	 */
+	public function languagesPath()
+	{
+		return $this->path() . DS . 'languages';
+	}
+
+	/**
 	 * Gets the absolute file path of the initialization PHP file of this construct.
 	 *
 	 * @return string

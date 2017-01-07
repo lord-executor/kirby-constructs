@@ -4,8 +4,10 @@ namespace Constructs;
 
 use Composer\Autoload\ClassLoader;
 use Constructs\Util\Dir;
+use Data;
 use F;
 use Kirby;
+use L;
 use Media;
 use Response;
 
@@ -117,6 +119,32 @@ class ConstructManager
 		}
 
 		return new Response('The file could not be found', F::extension($path), 404);
+	}
+
+	/**
+	 * Loads language files for all constructs. This function _must_ be called from within the site's language files
+	 * in order to work. Add the following piece of code to each language file at the top:
+	 *
+	 * ```php
+	 * \Constructs\ConstructManager::instance()->localize();
+	 * ```
+	 *
+	 * See also {@see Kirby::localize()}
+	 */
+	public function localize()
+	{
+		$lang = $this->kirby->site()->language()->code();
+
+		/** @var Construct $construct */
+		foreach ($this->constructs as $construct) {
+			$path = $construct->languagesPath() . DS . $lang;
+
+			// load .php file if it exists
+			if(f::exists($path . '.php')) include_once($path . '.php');
+
+			// load .yml file and set as language variables if it exists
+			if(f::exists($path . '.yml')) L::set(Data::read($path . '.yml', 'yaml'));
+		}
 	}
 
 	protected function registerComponents(Construct $construct)
