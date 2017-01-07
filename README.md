@@ -61,6 +61,10 @@ Note that the plugin directory must be named constructs and it must directly con
 * `constructs.dirs` - defaults to `['site/constructs']` \
   An array of paths, relative to the Kirby root, where constructs will be searched. Each construct has to be in it's
   own subdirectory with a `settings.yml` file in it (see [Creating a Construct]).
+* `constructs.components.container.default` - defaults to `:children:` \
+  If `:children:` is specified, a call to `$page->components()` without a parameter will return all children of the
+  page, if set to any other string, the function will try to locate a child page with the given name and fetch _its_
+  children. The function does not check if the returned pages are actually Components.
 
 ## Creating a Construct
 Creating a Construct is easy; all you really need is a directory with a `settings.yml` file in it. Then it becomes a
@@ -120,24 +124,24 @@ defaultTemplate: default-template.html.php
   practice is to make the name match the directory and use all lowercase and dashes.
 * **rootNamespace** (required if you have a `src` directory) \
   The root namespace for the Construct's `src` directory.
-* **defaultPageModel** (defaults to the Kirby `Constructs\ComponentPage` class)
+* **defaultPageModel** (defaults to the Kirby `Constructs\ComponentPage` class) \
   All components in this construct will use the model class (fully qualified class name) specified here unless
   overwritten explicitly by the `pageModel` property. `ComponentPage` derives directly from Kirby's `Page` class, but
   it adds some additional features. By setting this to `Page` you can create components that are backed by the regular
   Kirby page model.
-* **pageModel** (defaults to an empty map)
+* **pageModel** (defaults to an empty map) \
   With this property you can explicitly set a different page model class for each Component by mapping its name to a
   fully qualified page model class (e.g. `first.component-one: Page`).
-* **nesting** (defaults to `:children:`)
+* **nesting** (defaults to `:children:`) \
   Controls the nesting structure of components within a page. See [Components as Building Blocks] for more details.
-* **initFile** (defaults to `init.php`)
+* **initFile** (defaults to `init.php`) \
   Path (relative to the Construct directory) to the initialization PHP file. Similar to plugins, your Constructs _can_
   contain their own Kirby initialization code like adding field methods, etc. If the init file exists, it is executed
   directly after the Construct has been registered.
-* **defaultController** (defaults to NULL)
+* **defaultController** (defaults to NULL) \
   If set to the path of a controller PHP file, this controller will be used for all Components that don't have their
   own controller file.
-* **defaultTemplate** (defaults to NULL)
+* **defaultTemplate** (defaults to NULL) \
   If set to the path of a template file, this template will be used for all Components that don't have their own
   template file.
 
@@ -228,6 +232,25 @@ implementation makes reuse a lot easier - particularly for more complex sites.
 The Constructs plugin tries to not make too many (most likely invalid) assumptions about the way you want to structure
 your pages or how you want to use Components, but it provides some (hopefully) helpful functions that can be used to
 accomplish a wide variety of things.
+
+The core idea of Components is that they are pages that reside _under_ their _host_ page in the page hierarchy and
+do not function as full-fledged pages, but provide the content for specific areas in the host page. This can either be
+done by placing the components as direct _children_ of the host page (`nesting: :children:` in the configuration), or
+as _grandchildren_ of the host within an appropriately named child container (`nesting: :grandchildren:`). The two
+options exist because if a page should have Components **and** true sub-pages, then having the Components as direct
+children of the host causes some problems.
+
+You can fetch all Components of a given page with the `components` page method like this
+```php
+$page->components()
+// or
+$page->components('some-container')
+```
+
+And from a Component page (one that uses the `Constructs\ComponentPage` page model), you can fetch its host page with
+```php
+$component->host()
+```
 
 To get an idea of _how_ Constructs can be used to build pages, check out the [Kirby Constructs Sample](https://github.com/lord-executor/kirby-constructs-sample)
 on Github.
