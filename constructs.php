@@ -25,6 +25,10 @@ $kirby->routes([
 
 Page::$methods['components'] = function (Page $page, $container = NULL) {
 	if ($container === NULL) {
+		$container = c::get('constructs.components.container.default', ':children:');
+	}
+
+	if ($container === ':children:') {
 		return $page->children();
 	} else {
 		return $page->find($container)->children();

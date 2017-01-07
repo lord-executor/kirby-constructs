@@ -21,7 +21,7 @@ class ComponentPage extends Page
 		$construct = $this->kirby->get('construct', $this->intendedTemplate());
 
 		if ($construct) {
-			if ($construct->nesting() === 'children') {
+			if ($construct->nesting() === ':children:') {
 				return $this->parent();
 			} else {
 				return $this->parent()->parent();

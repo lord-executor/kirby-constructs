@@ -83,7 +83,7 @@ class Construct
 	 */
 	public function nesting()
 	{
-		return A::get($this->settings, 'nesting', 'children');
+		return A::get($this->settings, 'nesting', ':children:');
 	}
 
 	/**
