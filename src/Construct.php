@@ -23,17 +23,13 @@ class Construct
 	public function __construct($path)
 	{
 		$this->settings = Data::read($path . DS . 'settings.yml', 'yaml');
+		$this->settings['path'] = $path;
 		$name = $this->name();
 
-		// allow overrides of construct settings through Kirby config with naming convention
-		foreach ($this->settings as $key => $value) {
-			$confKey = implode('.', ['constructs', $name, $key]);
-			if (C::get($confKey)) {
-				$this->settings[$key] = C::get($confKey);
-			}
+		$configCallback = C::get(implode('.', ['constructs', $name, 'config']));
+		if (is_callable($configCallback)) {
+			call_user_func_array($configCallback, [$this, &$this->settings]);
 		}
-
-		$this->settings['path'] = $path;
 	}
 
 	/**
