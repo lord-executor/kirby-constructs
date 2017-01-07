@@ -69,11 +69,16 @@ class Construct
 	/**
 	 * Gets the fully qualified path name of the page model to be used for components in this construct.
 	 *
+	 * @param string $componentName
+	 *   The name of the component for which to retrieve the page model.
+	 *
 	 * @return string|NULL
 	 */
-	public function pageModel()
+	public function pageModel($componentName)
 	{
-		return A::get($this->settings, 'pageModel', 'Constructs\ComponentPage');
+		$map = A::get($this->settings, 'pageModel', []);
+
+		return (isset($map[$componentName]) ? $map[$componentName] : A::get($this->settings, 'defaultPageModel', 'Constructs\ComponentPage'));
 	}
 
 	/**

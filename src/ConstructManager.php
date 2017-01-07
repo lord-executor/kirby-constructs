@@ -137,8 +137,8 @@ class ConstructManager
 				$this->kirby->set('blueprint', $component->name(), $component->path() . DS . $component->name() . '.yml');
 				$this->kirby->set('construct', $component->name(), $construct);
 
-				if ($construct->pageModel()) {
-					$this->kirby->set('page::model', $component->name(), $construct->pageModel());
+				if ($model = $construct->pageModel($component->name())) {
+					$this->kirby->set('page::model', $component->name(), $model);
 				}
 
 				if (file_exists($component->path() . DS . $component->name() . '.php')) {
