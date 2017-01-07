@@ -127,11 +127,23 @@ class Construct
 	}
 
 	/**
-	 * Gets the default template to be used when a component does not define it's own template
+	 * Gets the default template to be used when a component does not define its own template
+	 *
+	 * return null|string
 	 */
 	public function defaultTemplate()
 	{
 		return $this->processRelativePath(A::get($this->settings, 'defaultTemplate'));
+	}
+
+	/**
+	 * Gets the default controller to be used when a component does not define its own controller
+	 *
+	 * @return null|string
+	 */
+	public function defaultController()
+	{
+		return $this->processRelativePath(A::get($this->settings, 'defaultController'));
 	}
 
 	/**

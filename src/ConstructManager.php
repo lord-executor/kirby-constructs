@@ -121,7 +121,15 @@ class ConstructManager
 
 	protected function registerComponents(Construct $construct)
 	{
+		$defaultController = NULL;
 		$dir = new Dir($construct->componentsPath());
+
+		// If a controller is registered as a _file_, the controller registry only loads the controller once and all
+		// subsequent uses of that controller won't work because it will reload the file (require_once). Therefore,
+		// the default controller has to be registered as a closure.
+		if (($file = $construct->defaultController()) && file_exists($file)) {
+			$defaultController = require_once($file);
+		}
 
 		foreach ($dir->dirs() as $component) {
 
@@ -135,6 +143,8 @@ class ConstructManager
 
 				if (file_exists($component->path() . DS . $component->name() . '.php')) {
 					$this->kirby->set('controller', $component->name(), $component->path() . DS . $component->name() . '.php');
+				} else if ($defaultController) {
+					$this->kirby->set('controller', $component->name(), $defaultController);
 				}
 
 				if (file_exists($component->path() . DS . $component->name() . '.html.php')) {
