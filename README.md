@@ -39,6 +39,7 @@ allows logical separation and reuse of Constructs.
 conventions.
 * All templates and snippets that come with a construct can be overwritten by placing a properly named alternative
 file in your normal Kirby `snippets` or `templates` directory.
+* Add language files to your Constructs with the option of overriding the defined strings in the site's language files.
 
 ## Installation
 ### Using the KirbyCLI
@@ -81,6 +82,9 @@ site/constructs/
         first.component-two.yml (blueprint)
     fields/
       ...
+    languages/
+      en.yml
+      ...
     src/
       ...
     init.php
@@ -102,9 +106,13 @@ site/constructs/
 ```
 name: sample-construct
 rootNamespace: SampleConstruct
-pageModel: Constructs\ComponentPage
-nesting: children
+defaultPageModel: Constructs\ComponentPage
+pageModel:
+  first.component-one: Page
+nesting: :children:
 initFile: init.php
+defaultController: default-controller.php
+defaultTemplate: default-template.html.php
 ```
 
 * **name** (required) \
@@ -112,16 +120,26 @@ initFile: init.php
   practice is to make the name match the directory and use all lowercase and dashes.
 * **rootNamespace** (required if you have a `src` directory) \
   The root namespace for the Construct's `src` directory.
-* **pageModel** (defaults to the Kirby `Constructs\ComponentPage` class)
-  All components in this construct will use the model class (fully qualified class name) specified here. `ComponentPage`
-  derives directly from Kirby's `Page` class, but it adds some additional features. By setting this to `Page` you can
-  create components that are backed by the regular Kirby page model.
-* **nesting** (defaults to `children`)
+* **defaultPageModel** (defaults to the Kirby `Constructs\ComponentPage` class)
+  All components in this construct will use the model class (fully qualified class name) specified here unless
+  overwritten explicitly by the `pageModel` property. `ComponentPage` derives directly from Kirby's `Page` class, but
+  it adds some additional features. By setting this to `Page` you can create components that are backed by the regular
+  Kirby page model.
+* **pageModel** (defaults to an empty map)
+  With this property you can explicitly set a different page model class for each Component by mapping its name to a
+  fully qualified page model class (e.g. `first.component-one: Page`).
+* **nesting** (defaults to `:children:`)
   Controls the nesting structure of components within a page. See [Components as Building Blocks] for more details.
 * **initFile** (defaults to `init.php`)
   Path (relative to the Construct directory) to the initialization PHP file. Similar to plugins, your Constructs _can_
   contain their own Kirby initialization code like adding field methods, etc. If the init file exists, it is executed
   directly after the Construct has been registered.
+* **defaultController** (defaults to NULL)
+  If set to the path of a controller PHP file, this controller will be used for all Components that don't have their
+  own controller file.
+* **defaultTemplate** (defaults to NULL)
+  If set to the path of a template file, this template will be used for all Components that don't have their own
+  template file.
 
 ### Components
 **First, a word on naming**: Due to the way that Kirby blueprints work, every Component name has to be unique and
@@ -164,6 +182,23 @@ want to put that stuff in some PHP classes that you can then use from your Compo
 in field / page methods or models. With Constructs you can just put those classes into your Construct's `src`
 directory and as long as you follow [PSR-4](http://www.php-fig.org/psr/psr-4/) conventions in combination with the
 `rootNamespace` defined in the `settings.yml` all of your classes will be autoloaded for you.
+
+### Language Files
+Unfortunately, there is at this point no _reasonable_ way to automatically add additional language files to Kirby -
+that is, until [this Kirby issue]()https://github.com/getkirby/kirby/issues/532) gets resolved. Until then, there is
+a minimum of additional work required to get the language files for constructs to work.
+
+Add your language files to the `languages` directory of your construct in the usual way - both `yml`and `php` language
+files are supported and the naming follows the default Kirby `{languageCode}.{ext}` convention.
+
+To get those translations to load properly, you need to configure your site's language files (`site/languages/*`) to be
+PHP files and add the following line to the top of each of them:
+
+```php
+\Constructs\ConstructManager::instance()->localize();
+```
+
+This loads all the language files provided by the site's Constructs.
 
 ### Assets
 Very much in line with the route that Kirby provides for [plugin assets](https://getkirby.com/docs/developer-guide/plugins/assets),
@@ -219,15 +254,16 @@ constructs/{constructName}/{pathToSnippet}/{snippetName}
 
 ### Construct Configuration
 You can also override the Construct configuration in the `settings.yml` file using Kirby's configuration. To do this,
-you can set each settings key individually according to the following Kirby config key naming convention.
+you can register a configuration callback function for each Construct like this:
 ```
-constructs.{constructName}.{settingsKey}
+c::set('constructs.{constructName}.config', function (\Constructs\Construct $construct, array &$settings) {
+    $settings['initFile'] = '/path/to/customized/init.php';
+});
 ```
 
-So, to override the init file of `my-construct`, you could do something like this:
-```php
-c::set('constructs.my-construct.initFile', '/path/to/custom/initFile.php');
-```
+The function receives the Construct metadata object which you can query for the current settings and a reference to the
+underlying settings array which you can modify. The example above redefined the `initFile` property of the construct to
+point to a custom file outsied of the Construct directory.
 
 **Note** that most changes you can make here will inevitably **break** the construct. There are however _some_ cases where
 this could be useful, for example if you are trying to override the Construct initialization with your own code.
