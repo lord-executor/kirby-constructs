@@ -3,6 +3,7 @@
 namespace Constructs;
 
 use Page;
+use Redirect;
 
 
 /**
@@ -38,6 +39,22 @@ class ComponentPage extends Page
 	 */
 	public function render()
 	{
-		return $this->kirby->render($this);
+		return $this->kirby->render($this, ['component' => true]);
+	}
+
+	/**
+	 * Prevents components from being viewed directly
+	 */
+	public function controller($arguments = array())
+	{
+		if (!isset($arguments['component']) || isset($arguments['component']) !== true) {
+			if ($host = $this->host()) {
+				Redirect::to($host->uri());
+			} else {
+				Redirect::home();
+			}
+		}
+
+		return parent::controller($arguments);
 	}
 }
