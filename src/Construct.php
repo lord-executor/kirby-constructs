@@ -128,6 +128,16 @@ class Construct
 	}
 
 	/**
+	 * Gets the path to the assets of the constructs.
+	 *
+	 * @return string
+	 */
+	public function assetsPath()
+	{
+		return $this->path() . DS . 'assets';
+	}
+
+	/**
 	 * Gets the absolute file path of the initialization PHP file of this construct.
 	 *
 	 * @return string

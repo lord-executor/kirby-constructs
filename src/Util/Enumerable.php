@@ -31,10 +31,10 @@ class Enumerable implements IteratorAggregate
 	/**
 	 * Creates an Enumerable from any IteratorAggregate implementation (anything with a getIterator function).
 	 *
-	 * @param IteratorAggregate $inner
-	 *   The underlying iterable object.
+	 * @param Traversable $inner
+	 *   The underlying traversable object.
 	 */
-	public function __construct(IteratorAggregate $inner)
+	public function __construct(Traversable $inner)
 	{
 		$this->inner = $inner;
 	}
@@ -78,6 +78,16 @@ class Enumerable implements IteratorAggregate
 		}
 
 		return new Enumerable(new ArrayObject($result));
+	}
+
+	/**
+	 * Returns an array with all the enumerable items.
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return iterator_to_array($this->inner);
 	}
 
 	/**

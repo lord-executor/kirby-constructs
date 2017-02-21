@@ -107,10 +107,11 @@ class ConstructManager
 	 */
 	public function assetsAction($constructName, $path)
 	{
+		/** @var Construct $construct */
 		$construct = $this->constructs[$constructName];
 
 		if ($construct) {
-			$assetPath = $construct->path() . DS . 'assets' . DS . $path;
+			$assetPath = $construct->assetsPath() . DS . $path;
 			$file = new Media($assetPath);
 
 			if ($file->exists()) {

@@ -31,6 +31,7 @@ Page::$methods['components'] = function (Page $page, $container = NULL) {
 	if ($container === ':children:') {
 		return $page->children();
 	} else {
-		return $page->find($container)->children();
+		$containerPage = $page->find($container);
+		return ($containerPage ? $containerPage->children() : new Pages());
 	}
 };

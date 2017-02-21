@@ -1,3 +1,17 @@
+# Table of Contents
+* [Kirby Constructs](#kirby-constructs)
+* [Features](#features)
+* [Installation](#installation)
+* [Creating a Construct](#creating-a-construct)
+  * [settings.yml](#settingsyml)
+  * [Components](#components)
+  * [Global Fields](#global-fields)
+  * [Snippets](#snippets)
+  * [Classes](#classes)
+  * [Assets](#assets)
+* [Components as Building Blocks](#components-as-building-blocks)
+* [Overriding Constructs](#overriding-constructs)
+
 # Kirby Constructs
 
 The goal of the Constructs plugin is similar to that of the [Kirby Modules Plugin](https://github.com/getkirby-plugins/modules-plugin),
@@ -21,7 +35,7 @@ to. The point of this plugin is to provide a common basis and layer of abstracti
 in every plugin. With Constructs, you can get straight to the point of your application, building blueprints and
 templates and do it in a way that is reusable.
 
-To get an idea of what could be done with Constructs, checkout the [Kirby Constructs Sample](https://github.com/lord-executor/kirby-constructs-sample)
+To get an idea of what could be done with Constructs, checkout the [Kirby Constructs Starterkit](https://github.com/lord-executor/kirby-constructs-starterkit)
 on Github.
 
 ## Features
@@ -60,7 +74,7 @@ Note that the plugin directory must be named constructs and it must directly con
 
 * `constructs.dirs` - defaults to `['site/constructs']` \
   An array of paths, relative to the Kirby root, where constructs will be searched. Each construct has to be in it's
-  own subdirectory with a `settings.yml` file in it (see [Creating a Construct]).
+  own subdirectory with a `settings.yml` file in it (see [Creating a Construct](#creating-a-construct)).
 * `constructs.components.container.default` - defaults to `:children:` \
   If `:children:` is specified, a call to `$page->components()` without a parameter will return all children of the
   page, if set to any other string, the function will try to locate a child page with the given name and fetch _its_
@@ -133,7 +147,7 @@ defaultTemplate: default-template.html.php
   With this property you can explicitly set a different page model class for each Component by mapping its name to a
   fully qualified page model class (e.g. `first.component-one: Page`).
 * **nesting** (defaults to `:children:`) \
-  Controls the nesting structure of components within a page. See [Components as Building Blocks] for more details.
+  Controls the nesting structure of components within a page. See [Components as Building Blocks](#components-as-building-blocks) for more details.
 * **initFile** (defaults to `init.php`) \
   Path (relative to the Construct directory) to the initialization PHP file. Similar to plugins, your Constructs _can_
   contain their own Kirby initialization code like adding field methods, etc. If the init file exists, it is executed
@@ -189,7 +203,7 @@ directory and as long as you follow [PSR-4](http://www.php-fig.org/psr/psr-4/) c
 
 ### Language Files
 Unfortunately, there is at this point no _reasonable_ way to automatically add additional language files to Kirby -
-that is, until [this Kirby issue]()https://github.com/getkirby/kirby/issues/532) gets resolved. Until then, there is
+that is, until [this Kirby issue](https://github.com/getkirby/kirby/issues/532) gets resolved. Until then, there is
 a minimum of additional work required to get the language files for constructs to work.
 
 Add your language files to the `languages` directory of your construct in the usual way - both `yml`and `php` language
@@ -252,7 +266,7 @@ And from a Component page (one that uses the `Constructs\ComponentPage` page mod
 $component->host()
 ```
 
-To get an idea of _how_ Constructs can be used to build pages, check out the [Kirby Constructs Sample](https://github.com/lord-executor/kirby-constructs-sample)
+To get an idea of _how_ Constructs can be used to build pages, check out the [Kirby Constructs Starterkit](https://github.com/lord-executor/kirby-constructs-starterkit)
 on Github.
 
 ## Overriding Constructs
@@ -291,6 +305,6 @@ point to a custom file outsied of the Construct directory.
 **Note** that most changes you can make here will inevitably **break** the construct. There are however _some_ cases where
 this could be useful, for example if you are trying to override the Construct initialization with your own code.
 
-# ToDo
+# ToDo (for the future)
 * Integration with Kirby JSON API plugin
 * Simple form of dependency injection (?)
